@@ -1,0 +1,3 @@
+- MIDI_IN is connected to U4/pin13, should be U4/pin14
+- Incorrect ZX BUS pinout. Following signal pairs should be swapped: NMI/MIX_R, MIX_L/RST, CLKCPU/A1
+- Incorrect connection between U5/pin4, U10/pin4 and U7/pin28. Should be cutted.
