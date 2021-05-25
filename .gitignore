@@ -1,0 +1,39 @@
+## Kicad
+*-lib-table
+*-cache
+*-rescue.lib
+*.sch-bak
+*.kicad_pcb-bak
+*.dcm
+*.kicad_prl
+pcb/**/*-backups/
+pcb/**/*.xml
+pcb/**/out/
+pcb/mask-color.png
+pcb.*/
+pcb/rev*~*/ 
+
+## Quartus
+cpld/**/db/
+cpld/**/incremental_db/
+cpld/**/output/
+cpld/**/*.dpf
+cpld/**/*.cdf
+cpld/**/*.qws
+cpld/**/*.srf
+cpld/**/simulation/
+cpld.*/
+
+## Testbench
+cpld/tb/ivl_vhdl_work/
+cpld/tb/work/
+cpld/tb/*.gtkw
+cpld/tb/*.vcd
+cpld/tb/*.bin
+cpld/tb/*.mem
+cpld/tb.*/
+
+## Etc.
+*.bak
+*.*~
+*.sublime-*
