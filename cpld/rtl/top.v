@@ -236,33 +236,33 @@ assign gdac1 = dac1v_cnt[6]? dac1_cnt[8] : 1'b0;
 assign gdac2 = dac2v_cnt[6]? dac2_cnt[8] : 1'b0;
 assign gdac3 = dac3v_cnt[6]? dac3_cnt[8] : 1'b0;
 always @(posedge clk32 or negedge rst_n) begin
- if (!rst_n) begin
-     dac0v_cnt <= 0;
-     dac1v_cnt <= 0;
-     dac2v_cnt <= 0;
-     dac3v_cnt <= 0;
-     dac0_cnt <= 0;
-     dac1_cnt <= 0;
-     dac2_cnt <= 0;
-     dac3_cnt <= 0;
- end
- else begin
-     dac0v_cnt <= dac0v_cnt[5:0] + gs_vol0;
-     dac1v_cnt <= dac1v_cnt[5:0] + gs_vol1;
-     dac2v_cnt <= dac2v_cnt[5:0] + gs_vol2;
-     dac3v_cnt <= dac3v_cnt[5:0] + gs_vol3;
-     if (dac0v_cnt[6]) dac0_cnt <= dac0_cnt[7:0] + gs_dac0;
-     if (dac1v_cnt[6]) dac1_cnt <= dac1_cnt[7:0] + gs_dac1;
-     if (dac2v_cnt[6]) dac2_cnt <= dac2_cnt[7:0] + gs_dac2;
-     if (dac3v_cnt[6]) dac3_cnt <= dac3_cnt[7:0] + gs_dac3;
- end
+    if (!rst_n) begin
+        dac0v_cnt <= 0;
+        dac1v_cnt <= 0;
+        dac2v_cnt <= 0;
+        dac3v_cnt <= 0;
+        dac0_cnt <= 0;
+        dac1_cnt <= 0;
+        dac2_cnt <= 0;
+        dac3_cnt <= 0;
+    end
+    else begin
+        dac0v_cnt <= dac0v_cnt[5:0] + gs_vol0;
+        dac1v_cnt <= dac1v_cnt[5:0] + gs_vol1;
+        dac2v_cnt <= dac2v_cnt[5:0] + gs_vol2;
+        dac3v_cnt <= dac3v_cnt[5:0] + gs_vol3;
+        if (dac0v_cnt[6]) dac0_cnt <= dac0_cnt[7:0] + gs_dac0;
+        if (dac1v_cnt[6]) dac1_cnt <= dac1_cnt[7:0] + gs_dac1;
+        if (dac2v_cnt[6]) dac2_cnt <= dac2_cnt[7:0] + gs_dac2;
+        if (dac3v_cnt[6]) dac3_cnt <= dac3_cnt[7:0] + gs_dac3;
+    end
 end
 
 /* GS BUS CONTROLLER */
 assign n_grom = (n_gmreq == 0 && ((ga[15:14] == 2'b00) || (ga[15] == 1'b1 && gs_page == 0)))? 1'b0 : 1'b1;
 assign n_gram = (n_gmreq == 0 && n_grom == 1'b1)? 1'b0 : 1'b1;
 assign gma = (ga[15] == 1'b0)? 4'b0001 : gs_page;
-assign gd = 
+assign gd =
     (g_ioreq && n_grd == 1'b0 && ga[3:0] == 4'h4)? gs_status :
     (g_ioreq && n_grd == 1'b0 && ga[3:0] == 4'h2)? gs_regb3 :
     (g_ioreq && n_grd == 1'b0 && ga[3:0] == 4'h1)? gs_regbb :
@@ -274,12 +274,12 @@ assign gd =
 assign n_ard = n_rd;
 assign n_awr = n_wr;
 
-assign aa0 = 
+assign aa0 =
     (port_bffd || port_fffd)? ym_a0 :
     (port_ff)? saa_a0 :
     aa0;
 
-assign ad = 
+assign ad =
     n_awr == 1'b0 && ioreq && (port_fffd || port_bffd || port_ff)? d :
     8'bzzzzzzzz;
 
