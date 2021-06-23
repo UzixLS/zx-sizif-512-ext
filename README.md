@@ -11,6 +11,10 @@ Extension board for [Sizif-512](https://github.com/UzixLS/zx-sizif-512).
 * MIDI sound
 
 ### Changelog & current status
-Work in progress!
 * Rev.A - first release. Please note the [errata](pcb/rev.A/ERRATA.txt).
-* Rev.A1 - coming soon
+* Rev.A1 - fixed all known issues of rev.A.
+
+### Related projects
+* Turbo Sound FM ([link](http://www.nedopc.com/TURBOSOUND/ts-fm.php))
+* ZXM-SoundCard ([link](http://micklab.ru/My%20Soundcard/ZXMSoundCard.htm))
+* ZXM-GeneralSound ([link](http://micklab.ru/My%20Soundcard/ZXMGeneralSound.htm))
