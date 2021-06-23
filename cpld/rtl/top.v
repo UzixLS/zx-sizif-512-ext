@@ -66,7 +66,7 @@ wire gs_ena = cfg[2];
 wire port_bffd = a[15:13] == 3'b101 && a[7:0] == 8'hFD && ym_ena;
 wire port_fffd = a[15:13] == 3'b111 && a[7:0] == 8'hFD && ym_ena;
 reg ym_chip_sel, ym_get_stat;
-wire ym_a0 = (~n_rd && port_fffd && ~ym_get_stat) || (~n_wr && port_bffd);
+wire ym_a0 = (~n_rd & a[14] & ~ym_get_stat) | (~n_wr & ~a[14]);
 assign n_ym1_cs = ~(~ym_chip_sel && (port_bffd || port_fffd) && ~n_iorq && n_m1);
 assign n_ym2_cs = ~( ym_chip_sel && (port_bffd || port_fffd) && ~n_iorq && n_m1);
 
@@ -93,7 +93,7 @@ end
 
 
 /* SAA1099 */
-wire port_ff = a[7:0] == 8'hff && saa_ena;
+wire port_ff = a[7:0] == 8'hFF && saa_ena;
 assign n_saa_cs = ~(port_ff && ~n_iorq && ~n_wr);
 wire saa_a0 = a[8];
 
