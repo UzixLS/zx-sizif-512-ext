@@ -274,7 +274,7 @@ assign n_busrq = 1'bz;
 assign n_iorqge = (port_fffd || port_bffd || port_b3 || port_bb)? 1'b1 : 1'bz;
 
 assign d =
-    ~n_rd && ~n_iorq && (port_fffd || port_bffd)? ad :
+    ~n_rd && ~n_iorq && port_fffd? ad :
     ~n_rd && ~n_iorq && port_b3? gs_reg03 :
     ~n_rd && ~n_iorq && port_bb? gs_status :
     8'bzzzzzzzz;
