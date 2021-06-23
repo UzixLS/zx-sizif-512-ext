@@ -122,9 +122,9 @@ set_location_assignment PIN_84 -to n_gwr
 set_location_assignment PIN_86 -to gma[18]
 set_location_assignment PIN_87 -to gma[15]
 set_location_assignment PIN_88 -to n_grom
-set_location_assignment PIN_90 -to cfg[2]
+set_location_assignment PIN_90 -to cfg[0]
 set_location_assignment PIN_91 -to cfg[1]
-set_location_assignment PIN_92 -to cfg[0]
+set_location_assignment PIN_92 -to cfg[2]
 set_location_assignment PIN_93 -to n_busack
 set_location_assignment PIN_96 -to n_halt
 set_location_assignment PIN_97 -to n_busrq
