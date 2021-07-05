@@ -215,32 +215,32 @@ always @(posedge clk32) begin
 end
 
 /* GS DAC */
-reg [6:0] dac0v_cnt, dac1v_cnt, dac2v_cnt, dac3v_cnt;
+reg vol0_en, vol1_en, vol2_en, vol3_en;
+reg [5:0] vol_cnt;
 reg [8:0] dac0_cnt, dac1_cnt, dac2_cnt, dac3_cnt;
-assign gdac0 = dac0v_cnt[6]? dac0_cnt[8] : 1'b0;
-assign gdac1 = dac1v_cnt[6]? dac1_cnt[8] : 1'b0;
-assign gdac2 = dac2v_cnt[6]? dac2_cnt[8] : 1'b0;
-assign gdac3 = dac3v_cnt[6]? dac3_cnt[8] : 1'b0;
+assign gdac0 = dac0_cnt[8];
+assign gdac1 = dac1_cnt[8];
+assign gdac2 = dac2_cnt[8];
+assign gdac3 = dac3_cnt[8];
 always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
-        dac0v_cnt <= 0;
-        dac1v_cnt <= 0;
-        dac2v_cnt <= 0;
-        dac3v_cnt <= 0;
+        {vol0_en, vol1_en, vol2_en, vol3_en} <= 0;
+        vol_cnt <= 0;
         dac0_cnt <= 0;
         dac1_cnt <= 0;
         dac2_cnt <= 0;
         dac3_cnt <= 0;
     end
     else begin
-        dac0v_cnt <= dac0v_cnt[5:0] + gs_vol0;
-        dac1v_cnt <= dac1v_cnt[5:0] + gs_vol1;
-        dac2v_cnt <= dac2v_cnt[5:0] + gs_vol2;
-        dac3v_cnt <= dac3v_cnt[5:0] + gs_vol3;
-        if (dac0v_cnt[6]) dac0_cnt <= dac0_cnt[7:0] + gs_dac0;
-        if (dac1v_cnt[6]) dac1_cnt <= dac1_cnt[7:0] + gs_dac1;
-        if (dac2v_cnt[6]) dac2_cnt <= dac2_cnt[7:0] + gs_dac2;
-        if (dac3v_cnt[6]) dac3_cnt <= dac3_cnt[7:0] + gs_dac3;
+        vol_cnt <= vol_cnt + 6'd31;
+        vol0_en <= vol_cnt < gs_vol0;
+        vol1_en <= vol_cnt < gs_vol1;
+        vol2_en <= vol_cnt < gs_vol2;
+        vol3_en <= vol_cnt < gs_vol3;
+        if (vol0_en) dac0_cnt <= dac0_cnt[7:0] + gs_dac0; else dac0_cnt[8] <= 0;
+        if (vol1_en) dac1_cnt <= dac1_cnt[7:0] + gs_dac1; else dac1_cnt[8] <= 0;
+        if (vol2_en) dac2_cnt <= dac2_cnt[7:0] + gs_dac2; else dac2_cnt[8] <= 0;
+        if (vol3_en) dac3_cnt <= dac3_cnt[7:0] + gs_dac3; else dac3_cnt[8] <= 0;
     end
 end
 

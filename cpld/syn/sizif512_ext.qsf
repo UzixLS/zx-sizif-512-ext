@@ -164,7 +164,7 @@ set_location_assignment PIN_143 -to n_int
 set_location_assignment PIN_125 -to clkcpu
 set_location_assignment PIN_128 -to clk32
 set_location_assignment PIN_127 -to rst_n
-set_global_assignment -name MAX7000_OPTIMIZATION_TECHNIQUE SPEED
+set_global_assignment -name MAX7000_OPTIMIZATION_TECHNIQUE BALANCED
 set_global_assignment -name SYNTHESIS_SEED 1
 set_global_assignment -name ALLOW_POWER_UP_DONT_CARE OFF
 set_global_assignment -name PRE_MAPPING_RESYNTHESIS OFF
