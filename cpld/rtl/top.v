@@ -57,9 +57,24 @@ module sizif512_ext(
     output gdac3
 );
 
-wire ym_ena = cfg[0];
-wire saa_ena = cfg[1];
-wire gs_ena = cfg[2];
+
+/* MAGIC CONFIGURATION */
+reg ym_ena, saa_ena, gs_ena;
+always @(posedge clkcpu or negedge rst_n) begin
+    if (!rst_n) begin
+        ym_ena <= cfg[0];
+        saa_ena <= cfg[1];
+        gs_ena <= cfg[2];
+    end
+    else if (bus0 && ~n_iorq && ~n_wr && a[7:0] == 8'hFF) case (a[15:8])
+        8'hE1: ym_ena <= d[0];
+        8'hE2: saa_ena <= d[0];
+        8'hE3: gs_ena <= d[0];
+    endcase
+end
+
+wire magic_port = bus0 && a == 16'hE0FF;
+wire [7:0] magic_port_d = {5'b00000, cfg[2:0]};
 
 
 /* TURBO SOUND FM */
@@ -98,7 +113,7 @@ assign n_saa_cs = ~(port_ff && ~n_iorq && ~n_wr);
 wire saa_a0 = a[8];
 
 reg [1:0] saa_clk_cnt = 0;
-assign saa_clk = saa_clk_cnt[1] & saa_ena;
+assign saa_clk = saa_clk_cnt[1];
 always @(posedge clk32) begin
     saa_clk_cnt <= saa_clk_cnt + 1'b1;
 end
@@ -274,6 +289,7 @@ assign n_busrq = 1'bz;
 assign n_iorqge = (port_fffd || port_bffd || port_b3 || port_bb)? 1'b1 : 1'bz;
 
 assign d =
+    ~n_rd && ~n_iorq && magic_port? magic_port_d :
     ~n_rd && ~n_iorq && port_fffd? ad :
     ~n_rd && ~n_iorq && port_b3? gs_reg03 :
     ~n_rd && ~n_iorq && port_bb? gs_status :
