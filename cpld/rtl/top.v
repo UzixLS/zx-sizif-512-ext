@@ -286,7 +286,7 @@ assign n_romcsb = 1'bz;
 assign n_wait = 1'bz;
 assign n_busrq = 1'bz;
 
-assign n_iorqge = (port_fffd || port_bffd || port_b3 || port_bb)? 1'b1 : 1'bz;
+assign n_iorqge = (port_fffd || port_bffd)? 1'b1 : 1'bz;
 
 assign d =
     ~n_rd && ~n_iorq && magic_port? magic_port_d :
