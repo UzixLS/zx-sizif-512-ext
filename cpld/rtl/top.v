@@ -78,8 +78,9 @@ wire [7:0] magic_port_d = {5'b00000, cfg[2:0]};
 
 
 /* TURBO SOUND FM */
-wire port_bffd = a[15:13] == 3'b101 && a[7:0] == 8'hFD && ym_ena;
-wire port_fffd = a[15:13] == 3'b111 && a[7:0] == 8'hFD && ym_ena;
+wire port_bffd      = a[15:14] == 2'b10  && a[1:0] == 2'b01 && ym_ena;
+wire port_fffd      = a[15:14] == 2'b11  && a[1:0] == 2'b01 && ym_ena;
+wire port_fffd_full = a[15:13] == 3'b111 && a[1:0] == 2'b01 && ym_ena; // required for compatibility with #dffd port
 reg ym_chip_sel, ym_get_stat;
 wire ym_a0 = (~n_rd & a[14] & ~ym_get_stat) | (~n_wr & ~a[14]);
 assign n_ym1_cs = ~(~ym_chip_sel && (port_bffd || port_fffd) && ~n_iorq && n_m1);
@@ -286,11 +287,11 @@ assign n_romcsb = 1'bz;
 assign n_wait = 1'bz;
 assign n_busrq = 1'bz;
 
-assign n_iorqge = (port_fffd || port_bffd)? 1'b1 : 1'bz;
+assign n_iorqge = (n_m1 && (port_fffd_full || port_bffd))? 1'b1 : 1'bz;
 
 assign d =
     ~n_rd && ~n_iorq && magic_port? magic_port_d :
-    ~n_rd && ~n_iorq && port_fffd? ad :
+    ~n_rd && ~n_iorq && port_fffd_full? ad :
     ~n_rd && ~n_iorq && port_b3? gs_reg03 :
     ~n_rd && ~n_iorq && port_bb? gs_status :
     8'bzzzzzzzz;
