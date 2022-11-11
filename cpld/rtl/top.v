@@ -171,7 +171,7 @@ end
 
 /* GS INTERNAL REGISTERS */
 reg [7:0] gs_reg00, gs_reg03;
-wire [3:0] gs_page = gs_reg00[3:0];
+wire [4:0] gs_page = gs_reg00[4:0];
 reg [5:0] gs_vol0, gs_vol1, gs_vol2, gs_vol3;
 always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
@@ -263,7 +263,7 @@ end
 /* GS BUS CONTROLLER */
 assign n_grom = (~n_gmreq && ((ga[15:14] == 2'b00) || (ga[15] == 1'b1 && gs_page == 0)))? 1'b0 : 1'b1;
 assign n_gram = (~n_gmreq && n_grom)? 1'b0 : 1'b1;
-assign gma = (ga[15] == 1'b0)? 4'b0001 : gs_page;
+assign gma = (ga[15] == 1'b0)? 4'b0001 : gs_page[3:0];
 assign gd =
     (~n_giorq && ~n_grd && ga[3:0] == 4'h4)? gs_status :
     (~n_giorq && ~n_grd && ga[3:0] == 4'h2)? gs_regb3 :
