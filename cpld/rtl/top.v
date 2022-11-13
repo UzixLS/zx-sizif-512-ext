@@ -209,25 +209,25 @@ always @(posedge clk32 or negedge rst_n) begin
 end
 
 /* GS STATUS REGISTER */
-reg gs_status0, gs_status7;
-wire [7:0] gs_status = {gs_status7, 6'b111111, gs_status0};
+reg gs_flag_cmd, gs_flag_data;
+wire [7:0] gs_status = {gs_flag_data, 6'b111111, gs_flag_cmd};
 
 always @(posedge clk32) begin
     if ((~n_giorq && n_gm1 && ga[3:0] == 4'h2) || (~n_iorq && ~n_rd && port_b3))
-        gs_status7 <= 1'b0;
+        gs_flag_data <= 1'b0;
     else if ((~n_giorq && n_gm1 && ga[3:0] == 4'h3) || (~n_iorq && ~n_wr && port_b3))
-        gs_status7 <= 1'b1;
+        gs_flag_data <= 1'b1;
     else if (~n_giorq && n_gm1 && ga[3:0] == 4'hA)
-        gs_status7 <= ~gs_reg00[0];
+        gs_flag_data <= ~gs_reg00[0];
 end
 
 always @(posedge clk32) begin
     if (~n_giorq && n_gm1 && ga[3:0] == 4'h5)
-        gs_status0 <= 1'b0;
+        gs_flag_cmd <= 1'b0;
     else if (~n_iorq && ~n_wr && port_bb)
-        gs_status0 <= 1'b1;
+        gs_flag_cmd <= 1'b1;
     else if (~n_giorq && n_gm1 && ga[3:0] == 4'hB)
-        gs_status0 <= gs_vol0[5];
+        gs_flag_cmd <= gs_vol3[5];
 end
 
 /* GS DAC */
