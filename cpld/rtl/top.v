@@ -201,10 +201,10 @@ always @(posedge clk32 or negedge rst_n) begin
         gs_dac3 <= 0;
     end
     else if (~n_gmreq && ~n_grd && ga[15:13] == 3'b011) begin
-        if (ga[9:8] == 2'b00) gs_dac0 <= gd;
-        if (ga[9:8] == 2'b01) gs_dac1 <= gd;
-        if (ga[9:8] == 2'b10) gs_dac2 <= gd;
-        if (ga[9:8] == 2'b11) gs_dac3 <= gd;
+        if (ga[9:8] == 2'b00) gs_dac0 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+        if (ga[9:8] == 2'b01) gs_dac1 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+        if (ga[9:8] == 2'b10) gs_dac2 <= (gd[7]? gd : {gd[7],~gd[6:0]});
+        if (ga[9:8] == 2'b11) gs_dac3 <= (gd[7]? gd : {gd[7],~gd[6:0]});
     end
 end
 
@@ -233,31 +233,21 @@ end
 /* GS DAC */
 reg vol0_en, vol1_en, vol2_en, vol3_en;
 reg [5:0] vol_cnt;
-reg [8:0] dac0_cnt, dac1_cnt, dac2_cnt, dac3_cnt;
-assign gdac0 = dac0_cnt[8];
-assign gdac1 = dac1_cnt[8];
-assign gdac2 = dac2_cnt[8];
-assign gdac3 = dac3_cnt[8];
-always @(posedge clk32 or negedge rst_n) begin
-    if (!rst_n) begin
-        {vol0_en, vol1_en, vol2_en, vol3_en} <= 0;
-        vol_cnt <= 0;
-        dac0_cnt <= 0;
-        dac1_cnt <= 0;
-        dac2_cnt <= 0;
-        dac3_cnt <= 0;
-    end
-    else begin
-        vol_cnt <= vol_cnt + 6'd31;
-        vol0_en <= vol_cnt < gs_vol0;
-        vol1_en <= vol_cnt < gs_vol1;
-        vol2_en <= vol_cnt < gs_vol2;
-        vol3_en <= vol_cnt < gs_vol3;
-        if (vol0_en) dac0_cnt <= dac0_cnt[7:0] + gs_dac0; else dac0_cnt[8] <= 0;
-        if (vol1_en) dac1_cnt <= dac1_cnt[7:0] + gs_dac1; else dac1_cnt[8] <= 0;
-        if (vol2_en) dac2_cnt <= dac2_cnt[7:0] + gs_dac2; else dac2_cnt[8] <= 0;
-        if (vol3_en) dac3_cnt <= dac3_cnt[7:0] + gs_dac3; else dac3_cnt[8] <= 0;
-    end
+reg [7:0] dac0_cnt, dac1_cnt, dac2_cnt, dac3_cnt;
+assign gdac0 = dac0_cnt[7]? gs_dac0[7] : clk32;
+assign gdac1 = dac1_cnt[7]? gs_dac1[7] : clk32;
+assign gdac2 = dac2_cnt[7]? gs_dac2[7] : clk32;
+assign gdac3 = dac3_cnt[7]? gs_dac3[7] : clk32;
+always @(posedge clk32) begin
+    vol_cnt <= vol_cnt + 6'd31;
+    vol0_en <= (vol_cnt < gs_vol0) || (&gs_vol0);
+    vol1_en <= (vol_cnt < gs_vol1) || (&gs_vol1);
+    vol2_en <= (vol_cnt < gs_vol2) || (&gs_vol2);
+    vol3_en <= (vol_cnt < gs_vol3) || (&gs_vol3);
+    if (vol0_en) dac0_cnt <= dac0_cnt[6:0] + gs_dac0[6:0]; else dac0_cnt[7] <= 0;
+    if (vol1_en) dac1_cnt <= dac1_cnt[6:0] + gs_dac1[6:0]; else dac1_cnt[7] <= 0;
+    if (vol2_en) dac2_cnt <= dac2_cnt[6:0] + gs_dac2[6:0]; else dac2_cnt[7] <= 0;
+    if (vol3_en) dac3_cnt <= dac3_cnt[6:0] + gs_dac3[6:0]; else dac3_cnt[7] <= 0;
 end
 
 /* GS BUS CONTROLLER */
