@@ -152,30 +152,30 @@ always @(posedge clk12 or negedge rst_n) begin
 end
 
 /* GS EXTERNAL REGISTERS */
-reg [7:0] gs_regb3, gs_regbb;
+reg [7:0] gs_regdata, gs_regcmd;
 wire port_b3 = a[7:0] == 8'hB3 && gs_ena;
 wire port_bb = a[7:0] == 8'hBB && gs_ena;
 always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
-        gs_regb3 <= 0;
-        gs_regbb <= 0;
+        gs_regdata <= 0;
+        gs_regcmd <= 0;
     end
     else begin
         if (port_b3 && ~n_iorq && ~n_wr)
-            gs_regb3 <= d;
+            gs_regdata <= d;
         if (port_bb && ~n_iorq && ~n_wr)
-            gs_regbb <= d;
+            gs_regcmd <= d;
     end
 end
 
 /* GS INTERNAL REGISTERS */
-reg [7:0] gs_reg00, gs_reg03;
+reg [7:0] gs_reg00, gs_reg_out;
 wire [4:0] gs_page = gs_reg00[4:0];
 reg [5:0] gs_vol0, gs_vol1, gs_vol2, gs_vol3;
 always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
         gs_reg00 <= 0;
-        gs_reg03 <= 0;
+        gs_reg_out <= 0;
         gs_vol0 <= 0;
         gs_vol1 <= 0;
         gs_vol2 <= 0;
@@ -183,7 +183,7 @@ always @(posedge clk32 or negedge rst_n) begin
     end
     else if (~n_giorq && ~n_gwr) begin
         if (ga[3:0] == 4'h0) gs_reg00 <= gd;
-        if (ga[3:0] == 4'h3) gs_reg03 <= gd;
+        if (ga[3:0] == 4'h3) gs_reg_out <= gd;
         if (ga[3:0] == 4'h6) gs_vol0 <= gd[5:0];
         if (ga[3:0] == 4'h7) gs_vol1 <= gd[5:0];
         if (ga[3:0] == 4'h8) gs_vol2 <= gd[5:0];
@@ -255,8 +255,8 @@ assign n_gram = (~n_gmreq && n_grom)? 1'b0 : 1'b1;
 assign gma = (ga[15] == 1'b0)? 4'b0001 : gs_page[3:0];
 assign gd =
     (~n_giorq && ~n_grd && ga[3:0] == 4'h4)? gs_status :
-    (~n_giorq && ~n_grd && ga[3:0] == 4'h2)? gs_regb3 :
-    (~n_giorq && ~n_grd && ga[3:0] == 4'h1)? gs_regbb :
+    (~n_giorq && ~n_grd && ga[3:0] == 4'h2)? gs_regdata :
+    (~n_giorq && ~n_grd && ga[3:0] == 4'h1)? gs_regcmd :
     (~n_giorq && (~n_grd || ~n_gm1))?        {8{1'b1}} :
                                              {8{1'bz}} ;
 
@@ -281,7 +281,7 @@ assign n_iorqge = (n_m1 && (port_fffd_full || port_bffd))? 1'b1 : 1'bz;
 assign d =
     ~n_rd && ~n_iorq && magic_port? magic_port_d :
     ~n_rd && ~n_iorq && port_fffd_full? ad :
-    ~n_rd && ~n_iorq && port_b3? gs_reg03 :
+    ~n_rd && ~n_iorq && port_b3? gs_reg_out :
     ~n_rd && ~n_iorq && port_bb? gs_status :
     8'bzzzzzzzz;
 
