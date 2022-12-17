@@ -60,7 +60,7 @@ module sizif512_ext(
 
 /* MAGIC CONFIGURATION */
 reg ym_ena, saa_ena, gs_ena;
-always @(posedge clkcpu or negedge rst_n) begin
+always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
         ym_ena <= cfg[0];
         saa_ena <= cfg[1];
@@ -77,6 +77,18 @@ wire magic_port = bus0 && a == 16'hE0FF;
 wire [7:0] magic_port_d = {5'b00000, cfg[2:0]};
 
 
+/* CLOCKS */
+reg [5:0] clk3_5_cnt = 0;
+reg [1:0] clk8_cnt   = 0;
+reg [2:0] clk12_cnt  = 0;
+always @(posedge clk32) clk3_5_cnt <= clk3_5_cnt + 6'd7;
+always @(posedge clk32) clk8_cnt   <= clk8_cnt   + 1'b1;
+always @(posedge clk32) clk12_cnt  <= clk12_cnt  + 3'd3;
+wire clk3_5 = clk3_5_cnt[5];
+wire clk8   = clk8_cnt[1];
+wire clk12  = clk12_cnt[2];
+
+
 /* TURBO SOUND FM */
 wire port_bffd      = a[15:14] == 2'b10  && a[1:0] == 2'b01 && ym_ena;
 wire port_fffd      = a[15:14] == 2'b11  && a[1:0] == 2'b01 && ym_ena;
@@ -86,7 +98,7 @@ wire ym_a0 = (~n_rd & a[14] & ~ym_get_stat) | (~n_wr & ~a[14]);
 assign n_ym1_cs = ~(~ym_chip_sel && (port_bffd || port_fffd) && ~n_iorq && n_m1);
 assign n_ym2_cs = ~( ym_chip_sel && (port_bffd || port_fffd) && ~n_iorq && n_m1);
 
-always @(posedge clkcpu or negedge rst_n) begin
+always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
         ym_chip_sel <= 0;
         ym_get_stat <= 0;
@@ -101,40 +113,27 @@ always @(posedge clkcpu or negedge rst_n) begin
     end
 end
 
-reg [5:0] ym_m_cnt = 0;
-assign ym_m = ym_m_cnt[5];
-always @(posedge clk32) begin
-    ym_m_cnt <= ym_m_cnt + 6'd7;
-end
+assign ym_m = clk3_5;
 
 
 /* SAA1099 */
 wire port_ff = a[7:0] == 8'hFF && saa_ena;
 assign n_saa_cs = ~(port_ff && ~n_iorq && ~n_wr);
 wire saa_a0 = a[8];
-
-reg [1:0] saa_clk_cnt = 0;
-assign saa_clk = saa_clk_cnt[1];
-always @(posedge clk32) begin
-    saa_clk_cnt <= saa_clk_cnt + 1'b1;
-end
+assign saa_clk = clk8;
 
 
 /* MIDI */
-reg [2:0] midi_clk_cnt = 0;
-assign midi_clk = midi_clk_cnt[2];
-always @(posedge clk32) begin
-    midi_clk_cnt <= midi_clk_cnt + 3'd3;
-end
+assign midi_clk = clk12;
 
 
 /* GENERAL SOUND */
-assign gclk = midi_clk;
+assign gclk = clk12;
 assign n_grst = rst_n;
 
 reg [8:0] g_int_cnt;
 wire g_int_reload = g_int_cnt[8:6] == 4'b101;
-always @(posedge gclk or negedge rst_n) begin
+always @(posedge clk12 or negedge rst_n) begin
     if (!rst_n) begin
         g_int_cnt <= 0;
         n_gint <= 1'b1;
@@ -156,7 +155,7 @@ end
 reg [7:0] gs_regb3, gs_regbb;
 wire port_b3 = a[7:0] == 8'hB3 && gs_ena;
 wire port_bb = a[7:0] == 8'hBB && gs_ena;
-always @(posedge clkcpu or negedge rst_n) begin
+always @(posedge clk32 or negedge rst_n) begin
     if (!rst_n) begin
         gs_regb3 <= 0;
         gs_regbb <= 0;
