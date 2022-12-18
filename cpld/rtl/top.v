@@ -58,6 +58,13 @@ module sizif512_ext(
 );
 
 
+reg n_rd_wr_delayed, n_rd_wr_delayed1;
+always @(posedge clk32) begin
+    n_rd_wr_delayed <= n_rd_wr_delayed1;
+    n_rd_wr_delayed1 <= n_wr & n_rd;
+end
+
+
 /* MAGIC CONFIGURATION */
 reg ym_ena, saa_ena, gs_ena;
 always @(posedge clk32 or negedge rst_n) begin
@@ -211,20 +218,28 @@ end
 reg gs_flag_cmd, gs_flag_data;
 wire [7:0] gs_status = {gs_flag_data, 6'b111111, gs_flag_cmd};
 
-always @(posedge clk32) begin
-    if ((~n_giorq && n_gm1 && ga[3:0] == 4'h2) || (~n_iorq && ~n_rd && port_b3))
+always @(posedge clk32 or negedge rst_n) begin
+    if (!rst_n)
         gs_flag_data <= 1'b0;
-    else if ((~n_giorq && n_gm1 && ga[3:0] == 4'h3) || (~n_iorq && ~n_wr && port_b3))
+    else if (~n_iorq && ~n_rd && n_rd_wr_delayed && port_b3)
+        gs_flag_data <= 1'b0;
+    else if (~n_iorq && ~n_wr && n_rd_wr_delayed && port_b3)
+        gs_flag_data <= 1'b1;
+    else if (~n_giorq && n_gm1 && ga[3:0] == 4'h2)
+        gs_flag_data <= 1'b0;
+    else if (~n_giorq && n_gm1 && ga[3:0] == 4'h3)
         gs_flag_data <= 1'b1;
     else if (~n_giorq && n_gm1 && ga[3:0] == 4'hA)
         gs_flag_data <= ~gs_reg00[0];
 end
 
-always @(posedge clk32) begin
-    if (~n_giorq && n_gm1 && ga[3:0] == 4'h5)
+always @(posedge clk32 or negedge rst_n) begin
+    if (!rst_n)
         gs_flag_cmd <= 1'b0;
-    else if (~n_iorq && ~n_wr && port_bb)
+    else if (~n_iorq && ~n_wr && n_rd_wr_delayed && port_bb)
         gs_flag_cmd <= 1'b1;
+    else if (~n_giorq && n_gm1 && ga[3:0] == 4'h5)
+        gs_flag_cmd <= 1'b0;
     else if (~n_giorq && n_gm1 && ga[3:0] == 4'hB)
         gs_flag_cmd <= gs_vol3[5];
 end
