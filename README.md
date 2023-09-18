@@ -12,7 +12,7 @@ Extension board for [Sizif-512](https://github.com/UzixLS/zx-sizif-512).
 
 ### Changelog & current status
 * Rev.A - first release. Please note the [errata](pcb/rev.A/ERRATA.txt).
-* Rev.A1 - fixed all known issues of rev.A.
+* Rev.A1 - fixed all known issues of rev.A. Please note the [errata](pcb/rev.A1/ERRATA.txt).
 
 ### Related projects
 * Turbo Sound FM ([link](http://www.nedopc.com/TURBOSOUND/ts-fm.php))
