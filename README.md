@@ -2,7 +2,7 @@
 
 Extension board for [Sizif-512](https://github.com/UzixLS/zx-sizif-512).
 
-[![photo](images/revA.small.jpg)](images/revA.jpg?raw=true)
+[![photo](images/revA.small.jpg)](images/revA.jpg)
 
 ### Features
 * Turbo Sound FM
